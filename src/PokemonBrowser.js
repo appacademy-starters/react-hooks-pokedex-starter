@@ -1,35 +1,33 @@
 import React, { Component } from 'react';
 import { NavLink, Route } from 'react-router-dom';
-import { imageUrl } from './config';
 import PokemonDetail from './PokemonDetail';
+import LogoutButton from './LogoutButton';
 
 class PokemonBrowser extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
   render() {
-    if (!this.props.pokemon) {
+    const { pokemon } = this.props;
+    if (!pokemon) {
       return null;
     }
     return (
       <main>
+        <LogoutButton />
         <nav>
-          {this.props.pokemon.map(pokemon => {
+          {pokemon.map((pokemon) => {
             return (
               <NavLink key={pokemon.name} to={`/pokemon/${pokemon.id}`}>
                 <div className="nav-entry">
-                  <div className="nav-entry-image"
-                       style={{backgroundImage: `url('${imageUrl}${pokemon.imageUrl}')`}}>
-                  </div>
+                  <div
+                    className="nav-entry-image"
+                    style={{ backgroundImage: `url('${pokemon.imageUrl}')` }}
+                  ></div>
                   <h1>{pokemon.name}</h1>
                 </div>
               </NavLink>
             );
           })}
         </nav>
-        <Route path="/pokemon/:id" render={props => <PokemonDetail {...props} token={this.props.token} />} />
+        <Route path="/pokemon/:id" component={PokemonDetail} />
       </main>
     );
   }
