@@ -1,73 +1,94 @@
 import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
-import { baseUrl } from './config';
-import { PrivateRoute } from './routesUtil';
 import LoginPanel from './LoginPanel';
 import PokemonBrowser from './PokemonBrowser';
+import { PrivateRoute } from './routesUtil';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
-    const token = window.localStorage.getItem('state-pokedex-token');
+    const authToken = Cookies.get("token");
+    let currentUserId;
+    if (authToken) {
+      try {
+        const payload = authToken.split(".")[1];
+        const decodedPayload = atob(payload);
+        const payloadObj = JSON.parse(decodedPayload);
+        const { data } = payloadObj;
+        currentUserId = data.id;
+      } catch (e) {
+        Cookies.remove("token");
+      }
+    }
     this.state = {
       loaded: false,
-      needLogin: !token,
-      pokemon: [],
-      token,
+      currentUserId,
+      needLogin: !currentUserId,
     };
   }
 
-  async componentDidMount() {
-    this.setState({ loaded: true });
+  componentDidMount() {
     this.loadPokemon();
   }
 
-  async loadPokemon() {
-    const response = await fetch(`${baseUrl}/pokemon`, {
-      headers: { Authorization: `Bearer ${this.state.token}`}
+  handleCreated = (pokemon) => {
+    this.setState({
+      pokemon: [...this.state.pokemon, pokemon]
     });
+  }
+
+  async loadPokemon() {
+    const response = await fetch(`/api/pokemon`);
     if (response.ok) {
       const pokemon = await response.json();
       this.setState({
         pokemon,
         needLogin: false,
+        loaded: true
       });
     } else {
       this.setState({
-        needLogin: true
+        needLogin: true,
+        loaded: true,
       });
     }
   }
 
-  updateToken = token => {
-    window.localStorage.setItem('state-pokedex-token', token);
+  updateUser = currentUserId => {
     this.setState({
       needLogin: false,
-      token
+      currentUserId
     });
     this.loadPokemon();
   }
 
   render() {
-    const { loaded, needLogin, pokemon, token } = this.state;
-
+    const { loaded, currentUserId, needLogin, pokemon } = this.state;
     if (!loaded) {
       return null;
     }
+    const cProps = {
+      pokemon: pokemon,
+      handleCreated: this.handleCreated,
+      currentUserId: currentUserId
+    };
     return (
       <BrowserRouter>
         <Switch>
-          <Route
-            path="/login"
-            render={props => <LoginPanel {...props} updateToken={this.updateToken} />}
-          />
-          <PrivateRoute
-            path="/"
-            component={PokemonBrowser}
-            needLogin={needLogin}
-            componentProps={{ pokemon, token }}
-          />
+          <Route path="/login"
+            render={props => <LoginPanel {...props} updateUser={this.updateUser} />} />
+          <PrivateRoute path="/"
+                        exact={true}
+                        needLogin={needLogin}
+                        component={PokemonBrowser}
+                        cProps={cProps} />
+          <PrivateRoute path="/pokemon/:pokemonId"
+                        exact={true}
+                        needLogin={needLogin}
+                        component={PokemonBrowser}
+                        cProps={cProps} />
         </Switch>
       </BrowserRouter>
     )
