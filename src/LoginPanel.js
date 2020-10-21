@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
-
+import { baseUrl } from './config';
 
 class LoginPanel extends Component {
   constructor(props) {
@@ -9,35 +9,38 @@ class LoginPanel extends Component {
       email: 'demo@example.com',
       password: 'password',
     };
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.updateEmail = this.updateValue('email');
-    this.updatePassword = this.updateValue('password');
   }
 
-  async handleSubmit(e) {
+  handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await fetch(`/api/session`, {
+    const response = await fetch(`${baseUrl}/session`, {
       method: 'put',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(this.state),
     });
 
     if (response.ok) {
-      const { player } = await response.json();
-      this.props.updateUser(player.id);
-      this.setState({ currentUserId: player.id });
+      const { token } = await response.json();
+      this.props.updateToken(token);
+      this.setState({ token });
     }
   }
 
-  updateValue = name => e => {
-    this.setState({ [name]: e.target.value });
+  updateEmail = e => {
+    this.setState({ email: e.target.value });
+  }
+
+  updatePassword = e => {
+    this.setState({ password: e.target.value });
   }
 
   render() {
-    const { email, password, currentUserId } = this.state;
-    if (currentUserId) {
+    const { token, email, password } = this.state;
+
+    if (token) {
       return <Redirect to="/" />;
     }
+    
     return (
       <main className="centered middled">
         <form onSubmit={this.handleSubmit}>
