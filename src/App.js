@@ -1,19 +1,17 @@
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
 
 import PokemonBrowser from "./components/PokemonBrowser";
 
 const App = () => {
   return (
-    <BrowserRouter>
-      <Switch>
-        <Route
-          path={["/", "/pokemon", "/pokemon/:pokemonId"]}
-          exact
-        >
-          <PokemonBrowser />
-        </Route>
-      </Switch>
-    </BrowserRouter>
+    <Switch>
+      <Route
+        path={["/", "/pokemon", "/pokemon/:pokemonId"]}
+        exact
+      >
+        <PokemonBrowser />
+      </Route>
+    </Switch>
   );
 };
 
