@@ -62,4 +62,4 @@ const EditItemForm = ({ itemId, hideForm }) => {
   );
 };
 
-export default EditPokemonForm;
+export default EditItemForm;
