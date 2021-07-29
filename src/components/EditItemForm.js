@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 
-const EditPokemonForm = ({ itemId, hideForm }) => {
+const EditItemForm = ({ itemId, hideForm }) => {
   const item = useSelector(state => state.items[itemId]);
 
   const [happiness, setHappiness] = useState(item.happiness);
@@ -62,4 +62,4 @@ const EditPokemonForm = ({ itemId, hideForm }) => {
   );
 };
 
-export default EditPokemonForm;
+export default EditItemForm;
