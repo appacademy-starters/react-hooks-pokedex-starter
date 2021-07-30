@@ -100,7 +100,7 @@ const pokemonReducer = (state = initialState, action) => {
         ...state,
         [action.pokemonId]: {
           ...state[action.pokemonId],
-          items: state[action.pokemonId].filter(
+          items: state[action.pokemonId].items.filter(
             (item) => item.id !== action.itemId
           ),
         },
@@ -112,7 +112,7 @@ const pokemonReducer = (state = initialState, action) => {
         ...state,
         [action.item.pokemonId]: {
           ...state[action.item.pokemonId],
-          items: [...state[action.item.pokemonId], action.item.id],
+          items: [...state[action.item.pokemonId].items, action.item.id],
         },
       };
     }
